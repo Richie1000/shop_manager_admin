@@ -1,14 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:shop_manager_admin/screens/add_product_screen.dart';
-// import 'package:shop_manager_user/screens/sales_screen.dart';
-// import 'package:shop_manager_user/screens/stocks_screen.dart';
+
 import '../providers/auth.dart';
 import '../widgets/grid_item.dart';
-// import './receipts_screen.dart';
+import 'add_product_screen.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -17,7 +16,6 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Calculate the number of columns based on screen width
     final screenWidth = MediaQuery.of(context).size.width;
     final numColumns = (screenWidth / 200).round();
     final gridTitle = [
@@ -66,33 +64,140 @@ class HomePage extends StatelessWidget {
       pushReceiptsScreen,
       logout,
     ];
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Welcome!'),
       ),
       backgroundColor: Colors.white, // Set background color to white
-      body: GridView.builder(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: numColumns,
-          crossAxisSpacing: 10.0,
-          mainAxisSpacing: 10.0,
-        ),
-        itemCount: gridTitle.length,
-        itemBuilder: (context, index) {
-          return GridItem(
-            title: gridTitle[index],
+      body: Column(
+        children: [
+          // Card displaying today's date and total amount
+          Card(
+            margin: EdgeInsets.all(16.0),
+            child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Left column displaying today's date
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Today\'s Date',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 8.0),
+                      FutureBuilder<String>(
+                        future: _getFormattedDate(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return CircularProgressIndicator();
+                          } else if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          } else {
+                            return Text(
+                              snapshot.data!,
+                              style: TextStyle(
+                                fontSize: 18.0,
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                  // Right column displaying total amount of receipts
+                  FutureBuilder<double>(
+                    future: _getTotalReceiptsAmount(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else {
+                        double totalAmount = snapshot.data!;
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              'Total Amount',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 8.0),
+                            Text(
+                              '\$$totalAmount',
+                              style: TextStyle(
+                                fontSize: 18.0,
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            child: GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 10.0,
+                mainAxisSpacing: 10.0,
+              ),
+              itemCount: gridTitle.length,
+              itemBuilder: (context, index) {
+                return GridItem(
+                  title: gridTitle[index],
 
-            //subtitle: '',
-            //icon: Icon(Icons.)
-            onTap: () {
-              // Call the corresponding function from listOfFunctions
-              listOfFunctions[index]();
-            },
-            lottieAsset: 'assets/animations/${assetName[index]}.json',
-          );
-        },
+                  //subtitle: '',
+                  //icon: Icon(Icons.)
+                  onTap: () {
+                    // Call the corresponding function from listOfFunctions
+                    listOfFunctions[index]();
+                  },
+                  lottieAsset: 'assets/animations/${assetName[index]}.json',
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
+  }
+
+  // Helper function to format date
+  Future<String> _getFormattedDate() async {
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat('dd/MM/yyyy').format(now);
+    return formattedDate;
+  }
+
+  // Function to get total amount of receipts for today
+  Future<double> _getTotalReceiptsAmount() async {
+    DateTime today = DateTime.now();
+    DateTime startOfToday = DateTime(today.year, today.month, today.day);
+    DateTime endOfToday =
+        DateTime(today.year, today.month, today.day, 23, 59, 59);
+
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection('receipts')
+        .where('date', isGreaterThanOrEqualTo: startOfToday)
+        .where('date', isLessThanOrEqualTo: endOfToday)
+        .get();
+
+    double totalAmount = 0;
+    snapshot.docs.forEach((doc) {
+      totalAmount += doc['totalAmount'] as double;
+    });
+
+    return totalAmount;
   }
 }
