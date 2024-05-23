@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:shop_manager_admin/screens/detailsStatsScreen.dart';
 
 import '../providers/auth.dart';
 import '../widgets/grid_item.dart';
@@ -111,36 +112,44 @@ class HomePage extends StatelessWidget {
                       ],
                     ),
                     // Right column displaying total amount of receipts
-                    StreamBuilder<double>(
-                      stream: getTodayTotal(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return CircularProgressIndicator();
-                        } else if (snapshot.hasError) {
-                          return Text('Error: ${snapshot.error}');
-                        } else {
-                          double totalAmount = snapshot.data ?? 0.0;
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                'Total Amount',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              SizedBox(height: 8.0),
-                              Text(
-                                '\$$totalAmount',
-                                style: TextStyle(
-                                  fontSize: 18.0,
-                                ),
-                              ),
-                            ],
-                          );
-                        }
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => DetailStatsScreen()));
                       },
+                      child: StreamBuilder<double>(
+                        stream: getTodayTotal(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return CircularProgressIndicator();
+                          } else if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          } else {
+                            double totalAmount = snapshot.data ?? 0.0;
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  'Total Amount',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: 8.0),
+                                Text(
+                                  '\$$totalAmount',
+                                  style: TextStyle(
+                                    fontSize: 18.0,
+                                  ),
+                                ),
+                              ],
+                            );
+                          }
+                        },
+                      ),
                     ),
                   ]),
             ),
