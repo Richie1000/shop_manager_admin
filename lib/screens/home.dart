@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:shop_manager_admin/screens/detailsStatsScreen.dart';
 
 import '../providers/auth.dart';
 import '../widgets/grid_item.dart';
@@ -77,21 +78,49 @@ class HomePage extends StatelessWidget {
             child: Padding(
               padding: EdgeInsets.all(16.0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Left column displaying today's date
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Today\'s Date',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Left column displaying today's date
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Today\'s Date',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 8.0),
-                      FutureBuilder<String>(
-                        future: _getFormattedDate(),
+                        SizedBox(height: 8.0),
+                        FutureBuilder<String>(
+                          future: _getFormattedDate(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              return Text('Error: ${snapshot.error}');
+                            } else {
+                              return Text(
+                                snapshot.data!,
+                                style: TextStyle(
+                                  fontSize: 18.0,
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                    // Right column displaying total amount of receipts
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => DetailStatsScreen()));
+                      },
+                      child: StreamBuilder<double>(
+                        stream: getTodayTotal(),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
@@ -99,50 +128,30 @@ class HomePage extends StatelessWidget {
                           } else if (snapshot.hasError) {
                             return Text('Error: ${snapshot.error}');
                           } else {
-                            return Text(
-                              snapshot.data!,
-                              style: TextStyle(
-                                fontSize: 18.0,
-                              ),
+                            double totalAmount = snapshot.data ?? 0.0;
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  'Total Amount',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: 8.0),
+                                Text(
+                                  '\$$totalAmount',
+                                  style: TextStyle(
+                                    fontSize: 18.0,
+                                  ),
+                                ),
+                              ],
                             );
                           }
                         },
                       ),
-                    ],
-                  ),
-                  // Right column displaying total amount of receipts
-                  FutureBuilder<double>(
-                    future: _getTotalReceiptsAmount(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator();
-                      } else if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
-                      } else {
-                        double totalAmount = snapshot.data!;
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              'Total Amount',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 8.0),
-                            Text(
-                              '\$$totalAmount',
-                              style: TextStyle(
-                                fontSize: 18.0,
-                              ),
-                            ),
-                          ],
-                        );
-                      }
-                    },
-                  ),
-                ],
-              ),
+                    ),
+                  ]),
             ),
           ),
           Expanded(
@@ -199,5 +208,33 @@ class HomePage extends StatelessWidget {
     });
 
     return totalAmount;
+  }
+
+  Stream<double> getTodayTotal() {
+    // Get today's date formatted as dd/MM/yyyy
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat('dd/MM/yyyy').format(now);
+
+    // Remove all slashes from the formatted date
+    String dateWithoutSlashes = formattedDate.replaceAll('/', '');
+
+    // Reference to the document with the modified date as the ID
+    DocumentReference docRef = FirebaseFirestore.instance
+        .collection('statistics')
+        .doc(dateWithoutSlashes);
+
+    // Return a stream of the total field
+    return docRef.snapshots().map((docSnapshot) {
+      if (docSnapshot.exists && docSnapshot.data() != null) {
+        // Cast the data to a map
+        Map<String, dynamic> data = docSnapshot.data() as Map<String, dynamic>;
+
+        // Return the total field as a double
+        return data['total']?.toDouble() ?? 0.0;
+      } else {
+        // If the document doesn't exist, return 0.0
+        return 0.0;
+      }
+    });
   }
 }
