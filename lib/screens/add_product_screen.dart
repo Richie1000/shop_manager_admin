@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shop_manager_admin/screens/loading_screen.dart';
 import 'package:shop_manager_admin/widgets/custom_toast.dart';
-import 'package:uuid/uuid.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/product.dart';
 
@@ -27,13 +26,75 @@ class _AddProductScreenState extends State<AddProductScreen> {
     'yards',
     'none'
   ];
+  
+void _updatesubmitForm() async {
+  if (_formKey.currentState!.validate()) {
+    setState(() {
+      _isLoading = true;
+    });
 
+    try {
+      // Check if the product already exists
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('products')
+          .where('name', isEqualTo: _nameController.text)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // Product exists, update it
+        DocumentSnapshot docSnapshot = querySnapshot.docs.first;
+        await FirebaseFirestore.instance
+            .collection('products')
+            .doc(docSnapshot.id)
+            .update({
+          'sellingPrice': double.parse(_priceController.text),
+          'buyingPrice': double.parse(_buyingPriceController.text),
+          'quantity': int.parse(_quantityController.text),
+        });
+
+        // Update local product object
+        final updatedProduct = Product(
+          id: docSnapshot.id,
+          name: _nameController.text,
+          sellingPrice: double.parse(_priceController.text),
+          buyingPrice: double.parse(_buyingPriceController.text),
+          quantity: int.parse(_quantityController.text),
+          uom: _selectedUom,
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Product ${updatedProduct.name} updated!')),
+        );
+      } else {
+        // Product does not exist, show a toast message
+          ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Product doesnot exist add it as a new product')),
+        );
+      }
+    } catch (e) {
+      CustomToast(message: e.toString());
+    } finally {
+      _buyingPriceController.clear();
+      _nameController.clear();
+      _priceController.clear();
+      _quantityController.clear();
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+}
   void _submitForm() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
       });
       try {
+           QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('products')
+          .where('name', isEqualTo: _nameController.text)
+          .get();
+        if(querySnapshot.docs.isEmpty){
         final docRef =
             await FirebaseFirestore.instance.collection('products').add({
           'name': _nameController.text,
@@ -49,18 +110,23 @@ class _AddProductScreenState extends State<AddProductScreen> {
           sellingPrice: double.parse(_priceController.text),
           buyingPrice: double.parse(_buyingPriceController.text),
           quantity: int.parse(_quantityController.text),
-          uom: _selectedUom!,
+          uom: _selectedUom,
         );
-
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Product ${_nameController} added!')),
+        );
         // Update the document with the correct ID
         await FirebaseFirestore.instance
             .collection('products')
             .doc(docRef.id)
             .set(newProduct.toMap());
+            } else{
+                ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Already existing product, update product instead')));
+            }
       } catch (e) {
         CustomToast(message: e.toString());
       } finally {
-        String productname = _nameController.text;
         _buyingPriceController.clear();
         _nameController.clear();
         _priceController.clear();
@@ -69,9 +135,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
         setState(() {
           _isLoading = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Product ${productname} added!')),
-        );
+        
       }
     }
   }
@@ -201,6 +265,21 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     ),
                     child: Text(
                       'Add Product',
+                      style: TextStyle(fontSize: 18.0, color: Colors.white),
+                    ),
+                  ),
+                      SizedBox(height: 32.0),
+                  ElevatedButton(
+                    onPressed: _updatesubmitForm,
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: 16.0),
+                      backgroundColor: Colors.teal,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+                    child: Text(
+                      'Update Product',
                       style: TextStyle(fontSize: 18.0, color: Colors.white),
                     ),
                   ),

@@ -6,6 +6,8 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shop_manager_admin/screens/addEmployeeScreen.dart';
 import 'package:shop_manager_admin/screens/detailsStatsScreen.dart';
+import 'package:shop_manager_admin/screens/sales_screen.dart';
+import 'package:shop_manager_admin/screens/stocks_screen.dart';
 
 import '../providers/auth.dart';
 import '../widgets/grid_item.dart';
@@ -28,7 +30,7 @@ class HomePage extends StatelessWidget {
       "Logout",
       "Add Employee",
     ];
-    final assetName = ["cart", "stats", "stock", "receipts", "logout","stats",];
+    final assetName = ["cart", "stats", "stock", "receipts", "logout","employee",];
 
     Future<void> logout() async {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -37,8 +39,8 @@ class HomePage extends StatelessWidget {
 
     pushSalesScreen() {
       //pushScreen
-      // Navigator.push(
-      //     context, MaterialPageRoute(builder: (context) => SalesScreen()));
+       Navigator.push(
+           context, MaterialPageRoute(builder: (context) => SalesScreen()));
     }
 
     pushStatsScreen() {
@@ -48,8 +50,8 @@ class HomePage extends StatelessWidget {
     }
 
     pushStocksScreen() {
-      // Navigator.push(
-      //     context, MaterialPageRoute(builder: (context) => StocksScreen()));
+       Navigator.push(
+           context, MaterialPageRoute(builder: (context) => StocksScreen()));
       // //Navigator.pushReplacementNamed(context, '/stocksScreen');
       // //pushScreen
     }

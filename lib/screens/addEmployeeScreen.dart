@@ -19,8 +19,64 @@ class _AddemployeescreenState extends State<Addemployeescreen> {
   final List<String> _uomOptions = [
     'Editor',
     'User',
+    'inactive',
     'None',
   ];
+
+void _updatesubmitForm() async {
+  if (_formKey.currentState!.validate()) {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // Check if the product already exists
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('employee')
+          .where('email', isEqualTo: _emailController.text)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // Product exists, update it
+        DocumentSnapshot docSnapshot = querySnapshot.docs.first;
+        await FirebaseFirestore.instance
+            .collection('employee')
+            .doc(docSnapshot.id)
+            .update({
+           'email': _emailController.text,
+          'phoneNumber': double.parse(_phoneNumberController.text),
+          'role': _selectedRoleController
+        });
+
+        // Update local product object
+      final newProduct = Employee(
+          id: docSnapshot.id,
+          email: _emailController.text,
+          phoneNumber: double.parse(_phoneNumberController.text),
+          role: _selectedRoleController,
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Employee ${_emailController} updated!')),
+        );
+      } else {
+        // Product does not exist, show a toast message
+          ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Employee doesnot exist add it as a new product')),
+        );
+      }
+    } catch (e) {
+      CustomToast(message: e.toString());
+    } finally {
+    _emailController.clear();
+        _phoneNumberController.clear();
+        _selectedRoleController = "None";
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+}
 
   void _submitForm() async {
     if (_formKey.currentState!.validate()) {
@@ -28,6 +84,8 @@ class _AddemployeescreenState extends State<Addemployeescreen> {
         _isLoading = true;
       });
       try {
+        QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection("employee").where("email" ,isEqualTo: _emailController.text).get();
+        if(querySnapshot.docs.isEmpty){
         final docRef = await FirebaseFirestore.instance.collection('employees').add({
           'email': _emailController.text,
           'phoneNumber': double.parse(_phoneNumberController.text),
@@ -40,13 +98,22 @@ class _AddemployeescreenState extends State<Addemployeescreen> {
           phoneNumber: double.parse(_phoneNumberController.text),
           role: _selectedRoleController,
         );
-
+         ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Employee with email : ${_emailController.text} is added!')),
+        );
         // Update the document with the correct ID
         await FirebaseFirestore.instance
             .collection('employees')
             .doc(docRef.id)
             .set(newProduct.toMap());
-      } catch (e) {
+      } else {
+         ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Employee with ${_emailController.text} is already existing try updating instead!')),
+        );
+      }
+      } 
+      
+       catch (e) {
         CustomToast(message: e.toString());
       } finally {
         String productname = _emailController.text;
@@ -56,9 +123,7 @@ class _AddemployeescreenState extends State<Addemployeescreen> {
         setState(() {
           _isLoading = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Employee $productname added!')),
-        );
+       
       }
     }
   }
@@ -157,6 +222,21 @@ class _AddemployeescreenState extends State<Addemployeescreen> {
                     ),
                     child: Text(
                       'Add Employee',
+                      style: TextStyle(fontSize: 18.0, color: Colors.white),
+                    ),
+                  ),
+                    SizedBox(height: 32.0),
+                  ElevatedButton(
+                    onPressed: _updatesubmitForm,
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: 16.0),
+                      backgroundColor: Colors.teal,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+                    child: Text(
+                      'Update Employee',
                       style: TextStyle(fontSize: 18.0, color: Colors.white),
                     ),
                   ),
