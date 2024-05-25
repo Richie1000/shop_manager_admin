@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop_manager_admin/providers/products.dart';
 
 import 'providers/auth.dart';
 import 'screens/auth_screen.dart';
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => AuthProvider()),
-        // ChangeNotifierProvider(create: (context) => Products()),
+        ChangeNotifierProvider(create: (context) => Products())
         // ChangeNotifierProvider(create: (context) => Cart()),
       ],
       child: MaterialApp(
