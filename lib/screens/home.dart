@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:shop_manager_admin/screens/addEmployeeScreen.dart';
 import 'package:shop_manager_admin/screens/detailsStatsScreen.dart';
 
 import '../providers/auth.dart';
@@ -23,10 +24,11 @@ class HomePage extends StatelessWidget {
       "Sale",
       "Add Product",
       "Stocks",
-      "Check Receipt",
-      "Logout"
+      "check Receipts",
+      "Logout",
+      "Add Employee",
     ];
-    final assetName = ["cart", "stats", "stock", "receipts", "logout"];
+    final assetName = ["cart", "stats", "stock", "receipts", "logout","stats",];
 
     Future<void> logout() async {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -51,11 +53,15 @@ class HomePage extends StatelessWidget {
       // //Navigator.pushReplacementNamed(context, '/stocksScreen');
       // //pushScreen
     }
+    pushAddEmployeeScreen(){
+        Navigator.push(
+           context, MaterialPageRoute(builder: (context) => Addemployeescreen()));
+    }
 
     pushReceiptsScreen() {
       // //pushScreen
       // Navigator.push(
-      //     context, MaterialPageRoute(builder: (context) => ReceiptScreen()));
+         //  context, MaterialPageRoute(builder: (context) => ()));
     }
 
     List<Function()> listOfFunctions = [
@@ -64,6 +70,7 @@ class HomePage extends StatelessWidget {
       pushStocksScreen,
       pushReceiptsScreen,
       logout,
+      pushAddEmployeeScreen,
     ];
     return Scaffold(
       appBar: AppBar(
