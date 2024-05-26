@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shop_manager_admin/widgets/total_revenue_section.dart';
 
 class AdminDashboard extends StatefulWidget {
   @override
@@ -12,13 +13,15 @@ class AdminDashboard extends StatefulWidget {
 
 class _AdminDashboardState extends State<AdminDashboard> {
   DateTimeRange? _customDateRange;
-    String _selectedOption = 'Today';
+  String _selectedOption = 'Today';
+  final usernameController = TextEditingController();
   Future<double>? _revenueFuture;
-   @override
+  @override
   void initState() {
     super.initState();
     _revenueFuture = getTodayTotal(); // Default to today's total
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,7 +40,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
               SizedBox(height: 20),
               _buildSalesPerformanceSection(),
               SizedBox(height: 20),
-              _buildEmployeePerformanceSection(),
+              TotalRevenueSection(usernameController: usernameController),
               SizedBox(height: 20),
               _buildOrdersManagementSection(),
             ],
@@ -47,7 +50,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
-  
   Widget _buildTotalRevenueSection() {
     return Card(
       elevation: 4,
@@ -56,7 +58,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Total Revenue', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            Text('Total Revenue',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -111,7 +114,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           _selectedOption = newValue!;
           switch (_selectedOption) {
             case 'Today':
-              _revenueFuture = getTodayTotal() ;
+              _revenueFuture = getTodayTotal();
               break;
             case 'Last Week':
               _revenueFuture = getLastWeekTotal();
@@ -130,8 +133,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
           }
         });
       },
-      items: <String>['Today', 'Last Week', 'Last Month', 'Last 3 Months', 'Custom']
-          .map<DropdownMenuItem<String>>((String value) {
+      items: <String>[
+        'Today',
+        'Last Week',
+        'Last Month',
+        'Last 3 Months',
+        'Custom'
+      ].map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
           child: Text(value),
@@ -139,8 +147,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
       }).toList(),
     );
   }
-
-
 
   Widget _buildRevenueChart() {
     // Placeholder for the chart
@@ -151,7 +157,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
- Widget _buildInventoryOverviewContent() {
+  Widget _buildInventoryOverviewContent() {
     return Container(
       height: 150,
       color: Colors.grey[200],
@@ -195,141 +201,130 @@ class _AdminDashboardState extends State<AdminDashboard> {
   }
 }
 
-
-  Widget _buildSalesPerformanceSection() {
-    return Card(
-      elevation: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Sales Performance', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            SizedBox(height: 10),
-            _buildSalesPerformanceContent(),
-          ],
-        ),
+Widget _buildSalesPerformanceSection() {
+  return Card(
+    elevation: 4,
+    child: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Sales Performance',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          SizedBox(height: 10),
+          _buildSalesPerformanceContent(),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 
-  Widget _buildSalesPerformanceContent() {
-    // Placeholder for sales performance content
-    return Container(
-      height: 150,
-      color: Colors.grey[200],
-      child: Center(child: AspectRatio(aspectRatio: 2.0, 
-      child:LineChart(LineChartData(lineBarsData: [
-        LineChartBarData(
-          show: true,
-          spots: const[
-            FlSpot(0, 0),
-            FlSpot(1, 0),
-             FlSpot(2, 4),
-              FlSpot(3, 1),
-               FlSpot(4, 4),
+Widget _buildSalesPerformanceContent() {
+  // Placeholder for sales performance content
+  return Container(
+    height: 150,
+    color: Colors.grey[200],
+    child: Center(
+      child: AspectRatio(
+        aspectRatio: 2.0,
+        child: LineChart(LineChartData(lineBarsData: [
+          LineChartBarData(
+              show: true,
+              spots: const [
+                FlSpot(0, 0),
+                FlSpot(1, 0),
+                FlSpot(2, 4),
+                FlSpot(3, 1),
+                FlSpot(4, 4),
                 FlSpot(5, 5),
-               FlSpot(5, 2),
-
-          ],
-          gradient: const LinearGradient(colors: [
-            Colors.cyan,
-            Colors.red,
-            Colors.purpleAccent
-          ],
-          begin: Alignment.bottomCenter,
-          end: Alignment.topCenter
-          ),
-          barWidth: 4,
-          isCurved: true
-        )
-
-      ])
-      ) ,)
-      
-      ,
+                FlSpot(5, 2),
+              ],
+              gradient: const LinearGradient(
+                  colors: [Colors.cyan, Colors.red, Colors.purpleAccent],
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter),
+              barWidth: 4,
+              isCurved: true)
+        ])),
       ),
-    );
-  }
+    ),
+  );
+}
 
-  Widget _buildEmployeePerformanceSection() {
-    return Card(
-      elevation: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Employee Performance', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            SizedBox(height: 10),
-            _buildEmployeePerformanceContent(),
-          ],
-        ),
+Widget _buildEmployeePerformanceSection() {
+  return Card(
+    elevation: 4,
+    child: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Employee Performance',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          SizedBox(height: 10),
+          _buildEmployeePerformanceContent(),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 
-  Widget _buildEmployeePerformanceContent() {
-    // Placeholder for employee performance content
-    return Container(
-      height: 150,
-      color: Colors.grey[200],
-      child: Center(child: Text('Employee Performance Placeholder')),
-    );
-  }
+Widget _buildEmployeePerformanceContent() {
+  // Placeholder for employee performance content
+  return Container(
+    height: 150,
+    color: Colors.grey[200],
+    child: Center(child: Text('Employee Performance Placeholder')),
+  );
+}
 
-  Widget _buildOrdersManagementSection() {
-    return Card(
-      elevation: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Orders Management', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            SizedBox(height: 10),
-            _buildOrdersManagementContent(),
-          ],
-        ),
+Widget _buildOrdersManagementSection() {
+  return Card(
+    elevation: 4,
+    child: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Orders Management',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          SizedBox(height: 10),
+          _buildOrdersManagementContent(),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 
-  Widget _buildOrdersManagementContent() {
-    // Placeholder for orders management content
-    return Container(
-      height: 150,
-      color: Colors.grey[200],
-      child: Center(child: Text('Orders Management Placeholder')),
-    );
-  }
+Widget _buildOrdersManagementContent() {
+  // Placeholder for orders management content
+  return Container(
+    height: 150,
+    color: Colors.grey[200],
+    child: Center(child: Text('Orders Management Placeholder')),
+  );
+}
 
-  Future<String> _getFormattedDate() async {
-    // Placeholder function for getting formatted date
-    return DateFormat('yyyy-MM-dd').format(DateTime.now());
-  }
+Future<String> _getFormattedDate() async {
+  // Placeholder function for getting formatted date
+  return DateFormat('yyyy-MM-dd').format(DateTime.now());
+}
 
- 
+Future<Map<String, int>> fetchEmployeeCounts() async {
+  QuerySnapshot querySnapshot =
+      await FirebaseFirestore.instance.collection('employees').get();
 
+  Map<String, int> employeeCounts = {'User': 0, 'Editor': 0};
 
-   Future<Map<String, int>> fetchEmployeeCounts() async {
-    QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection('employees').get();
+  querySnapshot.docs.forEach((doc) {
+    String role = doc['role'];
+    if (role == 'User' || role == 'Editor') {
+      employeeCounts[role] = (employeeCounts[role] ?? 0) + 1;
+    }
+  });
 
-    Map<String, int> employeeCounts = {
-      'User': 0,
-      'Editor': 0
-    };
-
-    querySnapshot.docs.forEach((doc) {
-      String role = doc['role'];
-      if (role == 'User' || role == 'Editor') {
-        employeeCounts[role] = (employeeCounts[role] ?? 0) + 1;
-      }
-    });
-
-    return employeeCounts;
-  }
+  return employeeCounts;
+}
 
 Future<double> calculateTodayRevenue() async {
   double totalRevenue = 0.0;
@@ -346,13 +341,16 @@ Future<double> calculateTodayRevenue() async {
   return totalRevenue;
 }
 
-Future<double> calculateTotalRevenue(DateTime startDate, DateTime endDate) async {
+Future<double> calculateTotalRevenue(
+    DateTime startDate, DateTime endDate) async {
   double totalRevenue = 0.0;
 
   QuerySnapshot snapshot = await FirebaseFirestore.instance
       .collection('statistics')
-      .where('date', isGreaterThanOrEqualTo: DateFormat('dd/MM/yyyy').format(startDate))
-      .where('date', isLessThanOrEqualTo: DateFormat('dd/MM/yyyy').format(endDate))
+      .where('date',
+          isGreaterThanOrEqualTo: DateFormat('dd/MM/yyyy').format(startDate))
+      .where('date',
+          isLessThanOrEqualTo: DateFormat('dd/MM/yyyy').format(endDate))
       .get();
 
   for (var doc in snapshot.docs) {
@@ -363,8 +361,7 @@ Future<double> calculateTotalRevenue(DateTime startDate, DateTime endDate) async
 }
 
 Future<double> getTodayTotal() async {
-  
-  return await calculateTodayRevenue() ;
+  return await calculateTodayRevenue();
 }
 
 Future<double> getLastWeekTotal() async {

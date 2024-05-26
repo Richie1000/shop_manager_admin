@@ -24,7 +24,7 @@ class HomePage extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final numColumns = (screenWidth / 200).round();
     final gridTitle = [
-      "Dashboard"
+      "Dashboard",
       "Sale",
       "Add Product",
       "Stocks",
@@ -32,7 +32,15 @@ class HomePage extends StatelessWidget {
       "Add Employee",
       "Logout",
     ];
-    final assetName = ["dashboard","cart", "stats", "stock", "receipts","employee", "logout",];
+    final assetName = [
+      "dashboard",
+      "cart",
+      "stats",
+      "stock",
+      "receipts",
+      "employee",
+      "logout",
+    ];
 
     Future<void> logout() async {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -41,8 +49,8 @@ class HomePage extends StatelessWidget {
 
     pushSalesScreen() {
       //pushScreen
-       Navigator.push(
-           context, MaterialPageRoute(builder: (context) => SalesScreen()));
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => SalesScreen()));
     }
 
     pushStatsScreen() {
@@ -52,23 +60,25 @@ class HomePage extends StatelessWidget {
     }
 
     pushStocksScreen() {
-       Navigator.push(
-           context, MaterialPageRoute(builder: (context) => StocksScreen()));
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => StocksScreen()));
       // //Navigator.pushReplacementNamed(context, '/stocksScreen');
       // //pushScreen
     }
-    pushAddEmployeeScreen(){
-        Navigator.push(
-           context, MaterialPageRoute(builder: (context) => Addemployeescreen()));
+
+    pushAddEmployeeScreen() {
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => Addemployeescreen()));
     }
 
     pushReceiptsScreen() {
       // //pushScreen
       // Navigator.push(
-         //  context, MaterialPageRoute(builder: (context) => ()));
+      //  context, MaterialPageRoute(builder: (context) => ()));
     }
-    pushDashboardScreen(){
-
+    pushDashboardScreen() {
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => AdminDashboard()));
     }
 
     List<Function()> listOfFunctions = [
@@ -77,8 +87,8 @@ class HomePage extends StatelessWidget {
       pushStatsScreen,
       pushStocksScreen,
       pushReceiptsScreen,
+      pushAddEmployeeScreen,
       logout,
-     
     ];
     return Scaffold(
       appBar: AppBar(
@@ -100,9 +110,11 @@ class HomePage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         InkWell(
-                          onTap: (){
-                             Navigator.push(
-           context, MaterialPageRoute(builder: (context) => AdminDashboard()));
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => AdminDashboard()));
                           },
                           child: Text(
                             'Today\'s Date',
