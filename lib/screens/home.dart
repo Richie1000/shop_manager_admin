@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shop_manager_admin/screens/addEmployeeScreen.dart';
+import 'package:shop_manager_admin/screens/dashboardscreen.dart';
 import 'package:shop_manager_admin/screens/detailsStatsScreen.dart';
 import 'package:shop_manager_admin/screens/sales_screen.dart';
 import 'package:shop_manager_admin/screens/stocks_screen.dart';
@@ -23,14 +24,15 @@ class HomePage extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final numColumns = (screenWidth / 200).round();
     final gridTitle = [
+      "Dashboard"
       "Sale",
       "Add Product",
       "Stocks",
       "check Receipts",
-      "Logout",
       "Add Employee",
+      "Logout",
     ];
-    final assetName = ["cart", "stats", "stock", "receipts", "logout","employee",];
+    final assetName = ["dashboard","cart", "stats", "stock", "receipts","employee", "logout",];
 
     Future<void> logout() async {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -65,14 +67,18 @@ class HomePage extends StatelessWidget {
       // Navigator.push(
          //  context, MaterialPageRoute(builder: (context) => ()));
     }
+    pushDashboardScreen(){
+
+    }
 
     List<Function()> listOfFunctions = [
+      pushDashboardScreen,
       pushSalesScreen,
       pushStatsScreen,
       pushStocksScreen,
       pushReceiptsScreen,
       logout,
-      pushAddEmployeeScreen,
+     
     ];
     return Scaffold(
       appBar: AppBar(
@@ -93,10 +99,16 @@ class HomePage extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Today\'s Date',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
+                        InkWell(
+                          onTap: (){
+                             Navigator.push(
+           context, MaterialPageRoute(builder: (context) => AdminDashboard()));
+                          },
+                          child: Text(
+                            'Today\'s Date',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                         SizedBox(height: 8.0),

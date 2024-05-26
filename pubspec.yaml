@@ -53,6 +53,8 @@ dependencies:
   pdf: ^3.10.8
   shared_preferences: ^2.2.3
   firebase_storage: ^11.7.5
+  flutter_charts: ^0.5.2
+  fl_chart: ^0.68.0
 
 dev_dependencies:
   flutter_test:

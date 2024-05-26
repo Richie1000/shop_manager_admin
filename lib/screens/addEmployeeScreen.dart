@@ -44,7 +44,7 @@ class _AddemployeescreenState extends State<Addemployeescreen> {
               .doc(docSnapshot.id)
               .update({
             'email': _emailController.text,
-            'phoneNumber': double.parse(_phoneNumberController.text),
+           // 'phoneNumber': double.parse(_phoneNumberController.text),
             'role': _selectedRoleController
           });
 
