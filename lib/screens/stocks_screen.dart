@@ -21,29 +21,7 @@ String _selectedRole = "Viewer";
   bool _isEditor = false;
   bool _isLoading = true;
   
-  @override
-  void initState() {
-    super.initState();
-    _checkRole();
-  }
 
-  Future<void> _checkRole() async {
-    try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection("employee")
-          .where("role", isEqualTo: "Editor")
-          .get();
-      setState(() {
-        _isEditor = querySnapshot.docs.isNotEmpty;
-        _isLoading = false;
-      });
-    } catch (e) {
-      CustomToast(message: e.toString());
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
   @override
   Widget build(BuildContext context) {
     final productProvider = Provider.of<Products>(context, listen: false);
@@ -112,8 +90,8 @@ String _selectedRole = "Viewer";
                         return DataRow(cells: [
                           DataCell(Text(product.name)),
                           DataCell(Text(product.quantity.toString())),
-                          DataCell(Text('\$${product.sellingPrice.toStringAsFixed(2)}')),
-                          DataCell(Text('\$${product.buyingPrice.toStringAsFixed(2)}')),
+                          DataCell(Text('GHS${product.sellingPrice.toStringAsFixed(2)}')),
+                          DataCell(Text('GHS${product.buyingPrice.toStringAsFixed(2)}')),
                           DataCell(Text(product.uom)),
                         ]);
                       }).toList(),
@@ -125,17 +103,7 @@ String _selectedRole = "Viewer";
           ),
         ],
       ),
-      floatingActionButton: _isLoading
-          ? null
-          : _isEditor
-              ? FloatingActionButton.extended(
-                  onPressed: () {
-                    // Add functionality here
-                  },
-                  icon: Icon(Icons.add),
-                  label: Text("Add"),
-                )
-              : null,
+     
     );
   }
 }

@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:shop_manager_admin/screens/addEmployeeScreen.dart';
 import 'package:shop_manager_admin/screens/dashboardscreen.dart';
 import 'package:shop_manager_admin/screens/detailsStatsScreen.dart';
+import 'package:shop_manager_admin/screens/receipts_screen.dart';
 import 'package:shop_manager_admin/screens/sales_screen.dart';
 import 'package:shop_manager_admin/screens/stocks_screen.dart';
 
@@ -73,8 +74,8 @@ class HomePage extends StatelessWidget {
 
     pushReceiptsScreen() {
       // //pushScreen
-      // Navigator.push(
-      //  context, MaterialPageRoute(builder: (context) => ()));
+       Navigator.push(
+        context, MaterialPageRoute(builder: (context) => ReceiptScreen()));
     }
     pushDashboardScreen() {
       Navigator.push(
@@ -145,14 +146,8 @@ class HomePage extends StatelessWidget {
                       ],
                     ),
                     // Right column displaying total amount of receipts
-                    InkWell(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => DetailStatsScreen()));
-                      },
-                      child: StreamBuilder<double>(
+                    
+                       StreamBuilder<double>(
                         stream: getTodayTotal(),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
@@ -183,7 +178,7 @@ class HomePage extends StatelessWidget {
                           }
                         },
                       ),
-                    ),
+                    
                   ]),
             ),
           ),

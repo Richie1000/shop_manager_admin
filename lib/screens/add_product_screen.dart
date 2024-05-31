@@ -113,7 +113,7 @@ void _updatesubmitForm() async {
           uom: _selectedUom,
         );
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Product ${_nameController} added!')),
+          SnackBar(content: Text('Product ${_nameController.text} added!')),
         );
         // Update the document with the correct ID
         await FirebaseFirestore.instance

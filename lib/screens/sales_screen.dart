@@ -95,7 +95,7 @@ class _SalesScreenState extends State<SalesScreen> {
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text('Total: \$${cart.totalAmount.toStringAsFixed(2)}'),
+            child: Text('Total: GHS${cart.totalAmount.toStringAsFixed(2)}'),
           ),
           DropdownButton<String>(
             value: _selectedPaymentMethod,
