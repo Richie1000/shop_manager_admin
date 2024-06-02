@@ -69,7 +69,10 @@ String _selectedRole = "Viewer";
                   print(snapshot.error);
                   return Center(child: Text('Error fetching products'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text('No products available'));
+                return  Align(
+  alignment: Alignment.center,
+  child: Text('No products available'),
+);
                 } else {
                   final products = snapshot.data!
                       .where((product) => product.name

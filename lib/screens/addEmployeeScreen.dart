@@ -87,7 +87,7 @@ class _AddemployeescreenState extends State<Addemployeescreen> {
       });
       try {
         QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-            .collection("employee")
+            .collection("employees")
             .where("email", isEqualTo: _emailController.text)
             .get();
         if (querySnapshot.docs.isEmpty) {
@@ -109,11 +109,7 @@ class _AddemployeescreenState extends State<Addemployeescreen> {
                 content: Text(
                     'Employee with email : ${_emailController.text} is added!')),
           );
-          // Update the document with the correct ID
-          await FirebaseFirestore.instance
-              .collection('employees')
-              .doc(docRef.id)
-              .set(newProduct.toMap());
+         
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(

@@ -116,10 +116,7 @@ void _updatesubmitForm() async {
           SnackBar(content: Text('Product ${_nameController.text} added!')),
         );
         // Update the document with the correct ID
-        await FirebaseFirestore.instance
-            .collection('products')
-            .doc(docRef.id)
-            .set(newProduct.toMap());
+       
             } else{
                 ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Already existing product, update product instead')));
