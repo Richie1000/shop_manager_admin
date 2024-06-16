@@ -13,14 +13,12 @@ class _AddemployeescreenState extends State<Addemployeescreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _phoneNumberController = TextEditingController();
-  String _selectedRoleController = 'None';
+  String _selectedRoleController = 'User';
   bool _isLoading = false;
 
   final List<String> _uomOptions = [
     'Editor',
     'User',
-    'inactive',
-    'None',
   ];
 
   void _updatesubmitForm() async {
@@ -32,7 +30,7 @@ class _AddemployeescreenState extends State<Addemployeescreen> {
       try {
         // Check if the product already exists
         QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-            .collection('employee')
+            .collection('employees')
             .where('email', isEqualTo: _emailController.text)
             .get();
 
@@ -40,7 +38,7 @@ class _AddemployeescreenState extends State<Addemployeescreen> {
           // Product exists, update it
           DocumentSnapshot docSnapshot = querySnapshot.docs.first;
           await FirebaseFirestore.instance
-              .collection('employee')
+              .collection('employees')
               .doc(docSnapshot.id)
               .update({
             'email': _emailController.text,
@@ -72,7 +70,7 @@ class _AddemployeescreenState extends State<Addemployeescreen> {
       } finally {
         _emailController.clear();
         _phoneNumberController.clear();
-        _selectedRoleController = "None";
+        _selectedRoleController = "User";
         setState(() {
           _isLoading = false;
         });
@@ -91,19 +89,13 @@ class _AddemployeescreenState extends State<Addemployeescreen> {
             .where("email", isEqualTo: _emailController.text)
             .get();
         if (querySnapshot.docs.isEmpty) {
-          final docRef =
               await FirebaseFirestore.instance.collection('employees').add({
             'email': _emailController.text,
             //'phoneNumber': double.parse(_phoneNumberController.text),
-            'role': _selectedRoleController
+            'role': _selectedRoleController,
+            'active' : true
           });
 
-          final newProduct = Employee(
-            id: docRef.id,
-            email: _emailController.text,
-            //phoneNumber: double.parse(_phoneNumberController.text),
-            role: _selectedRoleController,
-          );
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
                 content: Text(
@@ -123,7 +115,7 @@ class _AddemployeescreenState extends State<Addemployeescreen> {
         String productname = _emailController.text;
         _emailController.clear();
         _phoneNumberController.clear();
-        _selectedRoleController = "None";
+        _selectedRoleController = "User";
         setState(() {
           _isLoading = false;
         });

@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Arturo',
+        title: 'AEL-MAL ELECTRICAL HUB',
         theme: ThemeData(
           //colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.deepPurple),
           scaffoldBackgroundColor: Colors.white,

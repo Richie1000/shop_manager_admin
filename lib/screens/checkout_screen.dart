@@ -1,3 +1,4 @@
+import 'package:currency_code_to_currency_symbol/currency_code_to_currency_symbol.dart';
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
 import 'package:provider/provider.dart';
@@ -20,6 +21,7 @@ class CheckoutScreen extends StatefulWidget {
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
   bool isLoading = false;
+  String symbol = getCurrencySymbol("GH¢");
   @override
   Widget build(BuildContext context) {
     final cart = Provider.of<Cart>(context);
@@ -41,7 +43,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   return ListTile(
                     title: Text(item.product.name),
                     subtitle: Text(
-                        '${item.quantity} x \$${item.product.sellingPrice.toStringAsFixed(2)}'),
+                        '${item.quantity} x ₵:${item.product.sellingPrice.toStringAsFixed(2)}'),
                     trailing: Text(
                         '\$${(item.quantity * item.product.sellingPrice).toStringAsFixed(2)}'),
                   );
@@ -50,7 +52,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text('Total: \$${cart.totalAmount.toStringAsFixed(2)}'),
+              child: Text('Total: ₵:${cart.totalAmount.toStringAsFixed(2)}'),
             ),
             ElevatedButton(
               onPressed: () async {

@@ -168,7 +168,7 @@ class HomePage extends StatelessWidget {
                                 ),
                                 SizedBox(height: 8.0),
                                 Text(
-                                  '\$$totalAmount',
+                                  '₵$totalAmount',
                                   style: TextStyle(
                                     fontSize: 18.0,
                                   ),

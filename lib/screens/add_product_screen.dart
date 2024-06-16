@@ -167,26 +167,7 @@ void _updatesubmitForm() async {
                       return null;
                     },
                   ),
-                  SizedBox(height: 16.0),
-                  TextFormField(
-                    controller: _priceController,
-                    decoration: InputDecoration(
-                      labelText: 'Selling Price',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.attach_money),
-                    ),
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter the selling price';
-                      }
-                      if (double.tryParse(value) == null) {
-                        return 'Please enter a valid price';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 16.0),
+                     SizedBox(height: 16.0),
                   TextFormField(
                     controller: _buyingPriceController,
                     decoration: InputDecoration(
@@ -196,15 +177,43 @@ void _updatesubmitForm() async {
                     ),
                     keyboardType: TextInputType.number,
                     validator: (value) {
+
                       if (value == null || value.isEmpty) {
                         return 'Please enter the buying price';
                       }
+                    
                       if (double.tryParse(value) == null) {
                         return 'Please enter a valid price';
                       }
                       return null;
                     },
                   ),
+                  SizedBox(height: 16.0),
+                  TextFormField(
+                    controller: _priceController,
+                    
+                    decoration: InputDecoration(
+                      labelText: 'Selling Price',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.attach_money),
+                    ),
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      final sellingPrice = double.tryParse(value!);
+                      if (value.isEmpty) {
+                        return 'Please enter the selling price';
+                      }
+                       final buyingPrice = double.tryParse(_buyingPriceController.text);
+                if (buyingPrice != null && sellingPrice! < buyingPrice) {
+               return 'Selling price cannot be less than buying price';
+              }
+                      if (double.tryParse(value) == null) {
+                        return 'Please enter a valid price';
+                      }
+                      return null;
+                    },
+                  ),
+               
                   SizedBox(height: 16.0),
                   TextFormField(
                     controller: _quantityController,

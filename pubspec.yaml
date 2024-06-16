@@ -55,7 +55,7 @@ dependencies:
   firebase_storage: ^11.7.5
   flutter_charts: ^0.5.2
   fl_chart: ^0.68.0
-
+  currency_code_to_currency_symbol: ^0.0.4
 dev_dependencies:
   flutter_test:
     sdk: flutter

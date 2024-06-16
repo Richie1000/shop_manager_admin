@@ -12,6 +12,11 @@ class AdminDashboard extends StatefulWidget {
 }
 
 class _AdminDashboardState extends State<AdminDashboard> {
+   bool _isUserSectionExpanded = false;
+  bool _isEditorSectionExpanded = false;
+  Map<String, int> _employeeCounts = {};
+ List<Map<String, dynamic>> _userEmails = [];
+  List<Map<String, dynamic>> _editorEmails = [];
   DateTimeRange? _customDateRange;
   String _selectedOption = 'Today';
   final usernameController = TextEditingController();
@@ -20,6 +25,29 @@ class _AdminDashboardState extends State<AdminDashboard> {
   void initState() {
     super.initState();
     _revenueFuture = getTodayTotal(); // Default to today's total
+     fetchEmployeeCounts().then((counts) {
+      setState(() {
+        _employeeCounts = counts;
+      });
+    });
+  }
+
+Future<List<Map<String, dynamic>>> fetchEmailsByRole(String role) async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('employees')
+        .where('role', isEqualTo: role)
+        .get();
+
+    List<Map<String, dynamic>> employees = [];
+    querySnapshot.docs.forEach((doc) {
+      employees.add({
+        'email': doc['email'],
+        'active': doc['active'],
+        'docId': doc.id,
+      });
+    });
+
+    return employees;
   }
 
   @override
@@ -94,7 +122,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 } else {
                   double totalRevenue = snapshot.data ?? 0.0;
                   return Text(
-                    'Total Revenue: \$${totalRevenue.toStringAsFixed(2)}',
+                    'Total Revenue: ₵:${totalRevenue.toStringAsFixed(2)}',
                     style: TextStyle(fontSize: 18.0),
                   );
                 }
@@ -161,33 +189,24 @@ class _AdminDashboardState extends State<AdminDashboard> {
     return Container(
       height: 150,
       color: Colors.grey[200],
-      child: FutureBuilder<Map<String, int>>(
-        future: fetchEmployeeCounts(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error fetching employee counts'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No employees available'));
-          } else {
-            final employeeCounts = snapshot.data!;
-            return ListView(
+      child: _employeeCounts.isEmpty
+          ? Center(child: CircularProgressIndicator())
+          : ListView(
               children: [
-                _buildRoleSection('Users', employeeCounts['User']!),
-                _buildRoleSection('Editors', employeeCounts['Editor']!),
+                _buildRoleSection('Users', _employeeCounts['User']!),
+                _buildRoleSection('Editors', _employeeCounts['Editor']!),
               ],
-            );
-          }
-        },
-      ),
+            ),
     );
   }
 
-  Widget _buildRoleSection(String role, int count) {
+ Widget _buildRoleSection(String role, int count) {
+    bool isExpanded = (role == 'Users' && _isUserSectionExpanded) ||
+        (role == 'Editors' && _isEditorSectionExpanded);
+
     return Card(
       margin: EdgeInsets.all(8.0),
-      child: ListTile(
+      child: ExpansionTile(
         title: Text(
           role,
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -196,10 +215,91 @@ class _AdminDashboardState extends State<AdminDashboard> {
           '$count',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
+        initiallyExpanded: isExpanded,
+        onExpansionChanged: (expanded) {
+          setState(() {
+            if (role == 'Users') {
+              _isUserSectionExpanded = expanded;
+              if (expanded && _userEmails.isEmpty) {
+                fetchEmailsByRole('User').then((emails) {
+                  setState(() {
+                    _userEmails = emails;
+                  });
+                });
+              }
+            } else if (role == 'Editors') {
+              _isEditorSectionExpanded = expanded;
+              if (expanded && _editorEmails.isEmpty) {
+                fetchEmailsByRole('Editor').then((emails) {
+                  setState(() {
+                    _editorEmails = emails;
+                  });
+                });
+              }
+            }
+          });
+        },
+        children: isExpanded
+            ? (role == 'Users' ? _userEmails : _editorEmails)
+                .map((employee) => _buildEmailTile(employee))
+                .toList()
+            : [],
       ),
     );
   }
+  Widget _buildEmailTile(Map<String, dynamic> employee) {
+    String email = employee['email'];
+    bool isActive = employee['active'];
+
+    return ListTile(
+      title: Text(email),
+      trailing: Switch(
+        value: isActive,
+        onChanged: (value) {
+          setState(() {
+            employee['active'] = value;
+            updateEmployeeActiveStatus(employee['docId'], value);
+            updateUserActiveStatusByEmail(email, value);
+          });
+        },
+      ),
+    );
+  }
+    Future<void> updateEmployeeActiveStatus(String docId, bool isActive) async {
+    await FirebaseFirestore.instance
+        .collection('employees')
+        .doc(docId)
+        .update({'active': isActive});
+      
+  }
+  Future<void> updateUserActiveStatusByEmail(String email, bool isActive) async {
+  try {
+    // Query the users collection to get the document ID where email matches
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('email', isEqualTo: email)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      String docId = querySnapshot.docs.first.id;
+      
+      // Update the active field using the document ID
+      await FirebaseFirestore.instance.collection('users').doc(docId).update({
+        'active': isActive,
+      });
+
+      print("User's active status updated successfully");
+    } else {
+      print("No user found with the given email");
+    }
+  } catch (error) {
+    print("Error updating user's active status: $error");
+  }
 }
+  
+}
+
+
 
 Widget _buildSalesPerformanceSection() {
   return Card(

@@ -54,10 +54,10 @@ class AuthScreen extends StatelessWidget {
                         ],
                       ),
                       child: Text(
-                        'ARTURO\'S',
+                        'AEL-MAL ELECTRICAL HUB',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 35,
+                          fontSize: 28,
                           fontFamily: 'Anton',
                           fontWeight: FontWeight.normal,
                         ),

@@ -82,7 +82,7 @@ class _TotalRevenueSectionState extends State<TotalRevenueSection> {
                   } else {
                     double totalRevenue = snapshot.data ?? 0.0;
                     return Text(
-                      'Total Revenue: \$${totalRevenue.toStringAsFixed(2)}',
+                      'Total Revenue: ₵${totalRevenue.toStringAsFixed(2)}',
                       style: TextStyle(fontSize: 18.0),
                     );
                   }

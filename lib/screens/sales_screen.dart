@@ -70,7 +70,7 @@ class _SalesScreenState extends State<SalesScreen> {
                       return ListTile(
                         title: Text(item.product.name),
                         subtitle: Text(
-                            '${item.quantity} x \$${item.product.sellingPrice.toStringAsFixed(2)} = \$${(item.quantity * item.product.sellingPrice).toStringAsFixed(2)}'),
+                            '${item.quantity} x ₵:${item.product.sellingPrice.toStringAsFixed(2)} = ₵:${(item.quantity * item.product.sellingPrice).toStringAsFixed(2)}'),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -95,7 +95,7 @@ class _SalesScreenState extends State<SalesScreen> {
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text('Total: GHS${cart.totalAmount.toStringAsFixed(2)}'),
+            child: Text('Total: ₵:${cart.totalAmount.toStringAsFixed(2)}'),
           ),
           DropdownButton<String>(
             value: _selectedPaymentMethod,

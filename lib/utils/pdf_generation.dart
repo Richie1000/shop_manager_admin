@@ -4,18 +4,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:flutter/material.dart';
-import 'package:pdf/pdf.dart' as pw;
 import 'package:pdf/widgets.dart' as pw;
 import 'package:shop_manager_admin/screens/addEmployeeScreen.dart';
 
-
-import 'package:uuid/uuid.dart';
 import '../providers/cart.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:intl/intl.dart';
 
-import '../screens/loading_screen.dart';
 
 String getReceiptNumber() {
   // Get the current DateTime
@@ -60,7 +56,7 @@ Future<Uint8List> generateAndSaveReceipt(
 ) async {
   try {
     // Check product quantities before proceeding
-    await checkProductQuantities(items);
+    await checkProductQuantities(context,items);
 
     // Initialize PDF document
     final pdf = pw.Document();
@@ -77,44 +73,72 @@ Future<Uint8List> generateAndSaveReceipt(
         await FirebaseFirestore.instance.collection('users').doc(userID).get();
     final String username = userData['username'];
 
-    final currentDate = DateFormat('dd/MM/yyyy').format(DateTime.now());
-
     // Add page to PDF
-    pdf.addPage(
-      pw.Page(
-        build: (context) => pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            // Add receipt header
-            pw.Text(
-              'Receipt #$receiptNumber', // Adding receipt number
-              style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
-            ),
-            pw.SizedBox(height: 20),
-            pw.Text('Items:'),
-            // Add items with date
-            pw.ListView.builder(
-              itemCount: items.length,
-              itemBuilder: (context, index) {
-                final item = items[index];
-                final currentDate = DateTime.now();
-                return pw.Text(
-                  '${item.product.name} - ${item.quantity} x \$${item.product.sellingPrice.toStringAsFixed(2)} = \$${(item.quantity * item.product.sellingPrice).toStringAsFixed(2)}',
-                );
-              },
-            ),
-
-            pw.Divider(),
-            // Add total amount
-            pw.Text('Total: \$${totalAmount.toStringAsFixed(2)}'),
-            // Add payment method
-            pw.Text('Payment Method: $paymentMethod'),
-            // Add username
-            pw.Text('\nServed by: $username on $currentDate'),
-          ],
+   pdf.addPage(
+  pw.Page(
+    build: (context) => pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        // Add company name as the header
+        pw.Center(
+          child: pw.Text(
+            'AEL-MAL ELECTRICAL HUB', // Replace with your company name
+            style: pw.TextStyle(fontSize: 28, fontWeight: pw.FontWeight.bold),
+          ),
         ),
-      ),
-    );
+        pw.SizedBox(height: 10),
+        pw.Divider(),
+        pw.SizedBox(height: 10),
+        // Add receipt header with receipt number
+        pw.Text(
+          'Receipt #$receiptNumber',
+          style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
+        ),
+        pw.SizedBox(height: 20),
+        // Add items section
+        pw.Text(
+          'Items:',
+          style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
+        ),
+        pw.SizedBox(height: 10),
+        // Add items with date
+        pw.ListView.builder(
+          itemCount: items.length,
+          itemBuilder: (context, index) {
+            final item = items[index];
+            return pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Text(
+                  '${item.product.name} - ${item.quantity} x GHS${item.product.sellingPrice.toStringAsFixed(2)} = GHS${(item.quantity * item.product.sellingPrice).toStringAsFixed(2)}',
+                ),
+                pw.SizedBox(height: 5),
+              ],
+            );
+          },
+        ),
+        pw.Divider(),
+        // Add total amount
+        pw.Text(
+          'Total: GHS${totalAmount.toStringAsFixed(2)}',
+          style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
+        ),
+        pw.SizedBox(height: 10),
+        // Add payment method
+        pw.Text(
+          'Payment Method: $paymentMethod',
+          style: pw.TextStyle(fontSize: 16),
+        ),
+        pw.SizedBox(height: 10),
+        // Add username and date
+        pw.Text(
+          'Served by: $username on ${DateFormat.yMMMd().format(DateTime.now())}',
+          style: pw.TextStyle(fontSize: 16),
+        ),
+      ],
+    ),
+  ),
+);
 
     // Save PDF to local storage
     final pdfBytes = await pdf.save();
@@ -221,7 +245,7 @@ Future<void> updateProductQuantities(List<CartItem> items) async {
   }
 }
 
-Future<void> checkProductQuantities(List<CartItem> items) async {
+Future<void> checkProductQuantities(BuildContext context,List<CartItem> items) async {
   final firestore = FirebaseFirestore.instance;
 
   for (var item in items) {
@@ -235,9 +259,11 @@ Future<void> checkProductQuantities(List<CartItem> items) async {
     final currentQuantity = snapshot['quantity'] as int;
 
     if (currentQuantity < item.quantity) {
-      CustomToast(
-          message: "Insufficient Stock for product: ${item.product.name}");
-      //Navigator.of(context).pop();
+   ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Insufficient Stock for product: ${item.product.name}"),
+        ),
+      );
       throw Exception("Insufficient stock for product: ${item.product.name}");
     }
   }
