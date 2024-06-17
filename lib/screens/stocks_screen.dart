@@ -14,13 +14,16 @@ class StocksScreen extends StatefulWidget {
 }
 
 class _StocksScreenState extends State<StocksScreen> {
-  TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
-String _selectedRole = "Viewer";
-  bool _isEditor = false;
-  bool _isLoading = true;
-  
+  String _selectedRole = "Viewer";
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,12 +70,12 @@ String _selectedRole = "Viewer";
                   return LoadingScreen();
                 } else if (snapshot.hasError) {
                   print(snapshot.error);
-                  return Center(child: Text('Error fetching products'));
+                  return const Center(child: Text('Error fetching products'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return  Align(
-  alignment: Alignment.center,
-  child: Text('No products available'),
-);
+                  return Align(
+                    alignment: Alignment.center,
+                    child: Text('No products available'),
+                  );
                 } else {
                   final products = snapshot.data!
                       .where((product) => product.name
@@ -93,8 +96,10 @@ String _selectedRole = "Viewer";
                         return DataRow(cells: [
                           DataCell(Text(product.name)),
                           DataCell(Text(product.quantity.toString())),
-                          DataCell(Text('GHS${product.sellingPrice.toStringAsFixed(2)}')),
-                          DataCell(Text('GHS${product.buyingPrice.toStringAsFixed(2)}')),
+                          DataCell(Text(
+                              'GHS${product.sellingPrice.toStringAsFixed(2)}')),
+                          DataCell(Text(
+                              'GHS${product.buyingPrice.toStringAsFixed(2)}')),
                           DataCell(Text(product.uom)),
                         ]);
                       }).toList(),
@@ -106,7 +111,6 @@ String _selectedRole = "Viewer";
           ),
         ],
       ),
-     
     );
   }
 }

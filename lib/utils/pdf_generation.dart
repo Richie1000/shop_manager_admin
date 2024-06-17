@@ -5,7 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:flutter/material.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:shop_manager_admin/screens/addEmployeeScreen.dart';
+import 'package:shop_manager_admin/widgets/custom_toast.dart';
 
 import '../providers/cart.dart';
 import 'dart:io';
@@ -127,13 +127,13 @@ Future<Uint8List> generateAndSaveReceipt(
         // Add payment method
         pw.Text(
           'Payment Method: $paymentMethod',
-          style: pw.TextStyle(fontSize: 16),
+          style: const pw.TextStyle(fontSize: 16),
         ),
         pw.SizedBox(height: 10),
         // Add username and date
         pw.Text(
           'Served by: $username on ${DateFormat.yMMMd().format(DateTime.now())}',
-          style: pw.TextStyle(fontSize: 16),
+          style: const pw.TextStyle(fontSize: 16),
         ),
       ],
     ),
@@ -158,13 +158,12 @@ Future<Uint8List> generateAndSaveReceipt(
     await addTransactionToFirestore(
         receiptNumber, items, totalAmount, paymentMethod, downloadUrl);
 
-    print('PDF saved to local storage: $filePath');
-
     return pdfBytes; // Return PDF bytes
   } catch (e) {
     CustomToast(message: e.toString());
     rethrow; // Rethrow the caught exception
   } finally {
+    // ignore: use_build_context_synchronously
     Navigator.of(context).pop(); // Ensure the loading dialog is dismissed
   }
 }
@@ -177,7 +176,6 @@ Future<String> savePdfToStorage(
       FirebaseStorage.instance.ref().child('receipts/$receiptNumber.pdf');
   await storageRef.putData(pdfBytes);
   final downloadUrl = await storageRef.getDownloadURL();
-  print('PDF saved to: $downloadUrl');
   return downloadUrl;
 }
 
@@ -259,6 +257,7 @@ Future<void> checkProductQuantities(BuildContext context,List<CartItem> items) a
     final currentQuantity = snapshot['quantity'] as int;
 
     if (currentQuantity < item.quantity) {
+   // ignore: use_build_context_synchronously
    ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Insufficient Stock for product: ${item.product.name}"),

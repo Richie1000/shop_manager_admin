@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lottie/lottie.dart';
@@ -62,7 +63,7 @@ class _SalesScreenState extends State<SalesScreen> {
         children: [
           Expanded(
             child: cart.items.isEmpty
-                ? Center(child: Text('No items in the cart'))
+                ? const Center(child: Text('No items in the cart'))
                 : ListView.builder(
                     itemCount: cart.items.length,
                     itemBuilder: (context, index) {
@@ -75,16 +76,16 @@ class _SalesScreenState extends State<SalesScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              icon: Icon(Icons.remove),
+                              icon: const Icon(Icons.remove),
                               onPressed: () => _decrementQuantity(item.product),
                             ),
                             Text(item.quantity.toString()),
                             IconButton(
-                              icon: Icon(Icons.add),
+                              icon: const Icon(Icons.add),
                               onPressed: () => _incrementQuantity(item.product),
                             ),
                             IconButton(
-                              icon: Icon(Icons.delete),
+                              icon: const Icon(Icons.delete),
                               onPressed: () => cart.removeItem(item.product),
                             ),
                           ],
@@ -139,7 +140,7 @@ class ProductSearchDelegate extends SearchDelegate<String> {
   List<Widget> buildActions(BuildContext context) {
     return [
       IconButton(
-        icon: Icon(Icons.clear),
+        icon: const Icon(Icons.clear),
         onPressed: () {
           query = '';
         },
@@ -150,7 +151,7 @@ class ProductSearchDelegate extends SearchDelegate<String> {
   @override
   Widget buildLeading(BuildContext context) {
     return IconButton(
-      icon: Icon(Icons.search),
+      icon: const Icon(Icons.search),
       onPressed: () {
         close(context, '');
       },
@@ -199,7 +200,9 @@ class ProductSearchDelegate extends SearchDelegate<String> {
                     fontSize: 16.0,
                   );
                 } catch (error) {
-                  print(error);
+                  if (kDebugMode) {
+                    print(error);
+                  }
                 }
               },
             );

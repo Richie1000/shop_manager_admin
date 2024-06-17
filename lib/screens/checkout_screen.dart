@@ -6,6 +6,7 @@ import 'package:printing/printing.dart';
 import 'package:shop_manager_admin/screens/addEmployeeScreen.dart';
 import 'package:shop_manager_admin/screens/loading_screen.dart';
 import 'package:shop_manager_admin/utils/pdf_generation.dart';
+import 'package:shop_manager_admin/widgets/custom_toast.dart';
 
 import '../providers/cart.dart';
 
@@ -21,7 +22,7 @@ class CheckoutScreen extends StatefulWidget {
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
   bool isLoading = false;
-  String symbol = getCurrencySymbol("GH¢");
+  
   @override
   Widget build(BuildContext context) {
     final cart = Provider.of<Cart>(context);
@@ -66,7 +67,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       onLayout: (PdfPageFormat format) async => pdf);
                   cart.clear();
                 } catch (error) {
-                  print('This is the error' + error.toString());
                   CustomToast(
                     message: error.toString(),
                   );

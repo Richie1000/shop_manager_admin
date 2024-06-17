@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shop_manager_admin/models/employee.dart';
+import 'package:shop_manager_admin/screens/loading_screen.dart';
+import 'package:shop_manager_admin/widgets/custom_toast.dart';
 
 class Addemployeescreen extends StatefulWidget {
   const Addemployeescreen({super.key});
@@ -47,7 +49,7 @@ class _AddemployeescreenState extends State<Addemployeescreen> {
           });
 
           // Update local product object
-          final newProduct = Employee(
+          Employee(
             id: docSnapshot.id,
             email: _emailController.text,
             //phoneNumber: double.parse(_phoneNumberController.text),
@@ -55,12 +57,12 @@ class _AddemployeescreenState extends State<Addemployeescreen> {
           );
 
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Employee ${_emailController} updated!')),
+            SnackBar(content: Text('Employee $_emailController updated!')),
           );
         } else {
           // Product does not exist, show a toast message
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
+            const SnackBar(
                 content:
                     Text('Employee doesnot exist add it as a new product')),
           );
@@ -112,7 +114,6 @@ class _AddemployeescreenState extends State<Addemployeescreen> {
       } catch (e) {
         CustomToast(message: e.toString());
       } finally {
-        String productname = _emailController.text;
         _emailController.clear();
         _phoneNumberController.clear();
         _selectedRoleController = "User";
@@ -127,7 +128,7 @@ class _AddemployeescreenState extends State<Addemployeescreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Employee'),
+        title: const Text('Add Employee'),
         backgroundColor: Colors.teal,
       ),
       backgroundColor: Colors.white,
@@ -141,7 +142,7 @@ class _AddemployeescreenState extends State<Addemployeescreen> {
                 children: [
                   TextFormField(
                     controller: _emailController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'User Email',
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.email),
@@ -153,33 +154,10 @@ class _AddemployeescreenState extends State<Addemployeescreen> {
                       return null;
                     },
                   ),
-                  SizedBox(height: 16.0),
-                  // TextFormField(
-                  //   maxLength: 10,
-                  //   controller: _phoneNumberController,
-                  //   decoration: InputDecoration(
-                  //     labelText: 'Phone Number',
-                  //     border: OutlineInputBorder(),
-                  //     prefixIcon: Icon(Icons.phone),
-                  //   ),
-                  //   keyboardType: TextInputType.phone,
-                  //   validator: (value) {
-                  //     if (value == null || value.isEmpty) {
-                  //       return 'Please enter the phone Number';
-                  //     }
-                  //     if (double.tryParse(value) == null) {
-                  //       return 'Please enter a valid phone number';
-                  //     }
-                  //     if (value.length != 10) {
-                  //       return 'Phone number must be 10 digits';
-                  //     }
-                  //     return null;
-                  //   },
-                  // ),
-                  // SizedBox(height: 16.0),
+                  const SizedBox(height: 16.0),
                   DropdownButtonFormField<String>(
                     value: _selectedRoleController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Role',
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.straighten),
@@ -205,32 +183,32 @@ class _AddemployeescreenState extends State<Addemployeescreen> {
                       return null;
                     },
                   ),
-                  SizedBox(height: 32.0),
+                  const SizedBox(height: 32.0),
                   ElevatedButton(
                     onPressed: _submitForm,
                     style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 16.0),
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
                       backgroundColor: Colors.teal,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0),
                       ),
                     ),
-                    child: Text(
+                    child: const Text(
                       'Add Employee',
                       style: TextStyle(fontSize: 18.0, color: Colors.white),
                     ),
                   ),
-                  SizedBox(height: 32.0),
+                  const SizedBox(height: 32.0),
                   ElevatedButton(
                     onPressed: _updatesubmitForm,
                     style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 16.0),
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
                       backgroundColor: Colors.teal,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0),
                       ),
                     ),
-                    child: Text(
+                    child: const Text(
                       'Update Employee',
                       style: TextStyle(fontSize: 18.0, color: Colors.white),
                     ),
@@ -238,9 +216,9 @@ class _AddemployeescreenState extends State<Addemployeescreen> {
                 ],
               ),
             ),
-            if (_isLoading)
+             if (_isLoading)
               Center(
-                child: CircularProgressIndicator(),
+                child: LoadingScreen(),
               )
           ],
         ),
@@ -249,6 +227,3 @@ class _AddemployeescreenState extends State<Addemployeescreen> {
   }
 }
 
-void CustomToast({required String message}) {
-  print(message);
-}
