@@ -13,7 +13,6 @@ class TotalRevenueSection extends StatefulWidget {
 }
 
 class _TotalRevenueSectionState extends State<TotalRevenueSection> {
-  DateTimeRange? _customDateRange;
   Future<double>? _revenueFuture;
 
   Future<double> _getCustomTotal(DateTimeRange dateRange) async {
